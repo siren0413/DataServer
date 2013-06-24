@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,7 +23,7 @@ import com.trading.dataGenerator.impl.*;
 public class StockServer {
 
 	public static void main(String[] args) {
-		ConnectionPool pool = new ConnectionPool(200, 8888);
+		ConnectionPool pool = new ConnectionPool(100, 8888);
 		ConnectionHandler handler = new StockConnectionHandler();
 		((StockDataGenerator) handler).generate();
 		pool.acceptConnections(handler);
@@ -37,31 +39,31 @@ class StockConnectionHandler extends StockDataGenerator implements ConnectionHan
 	public void serverProcess(final Socket socket) {
 		Date lastDate = new Date();
 		PrintWriter writer = null;
-		ArrayList<String> symbols = new ArrayList<String>();
+		Set<String> symbols = new HashSet<String>();
 
 		/**
 		 * Timer task to monitor is the client was already disconnect to this
 		 * server. If the remote client disconnected to this server, then close
 		 * this socket.
 		 */
-		final TimerTask task = new TimerTask() {
-
-			@Override
-			public void run() {
-				try {
-					socket.sendUrgentData(0);
-				} catch (Exception e) {
-					try {
-						socket.close();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				}
-
-			}
-		};
-		Timer timer = new Timer();
-		timer.schedule(task, 10000, 10000);
+//		final TimerTask task = new TimerTask() {
+//
+//			@Override
+//			public void run() {
+//				try {
+//					socket.sendUrgentData(0);
+//				} catch (Exception e) {
+//					try {
+//						socket.close();
+//					} catch (IOException e1) {
+//						e1.printStackTrace();
+//					}
+//				}
+//
+//			}
+//		};
+		//Timer timer = new Timer();
+		//timer.schedule(task, 10000, 10000);
 
 		/**
 		 * Send message to the remote client. If the remote client disconnect to
@@ -74,29 +76,36 @@ class StockConnectionHandler extends StockDataGenerator implements ConnectionHan
 			for(String s: syms) {
 				symbols.add(s);
 			}
+			if(symbols.size()==0)
+				return;
 			
 			writer = new PrintWriter(socket.getOutputStream());
 			while (!socket.isClosed()) {
-				if(!symbols.contains(profile.getSymbol()))
-					continue;
-				if (lastDate.compareTo(date) != 0) {
-					writer.write("SYMBOL=" + profile.getSymbol() + "*NAME=" + profile.getName() + "*PRICE=" + profile.getPrice()
-							+ "*TS=" + profile.getTs() + "*TYPE=" + profile.getType() + "*VOLUME=" + profile.getVolume() + "\n");
-					writer.flush();
-					lastDate.setTime(date.getTime());
-				}
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				if(!symbols.contains(profile.getSymbol()))
+					continue;
+				if (lastDate.compareTo(date) != 0) {
+					socket.sendUrgentData(0);
+					writer.write("SYMBOL=" + profile.getSymbol() + "*NAME=" + profile.getName() + "*PRICE=" + profile.getPrice()
+							+ "*TS=" + profile.getTs() + "*TYPE=" + profile.getType() + "*VOLUME=" + profile.getVolume() + "\n");
+					writer.flush();
+					lastDate.setTime(date.getTime());
+				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				socket.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		} finally {
 			writer.close();
-			timer.cancel();
-			timer = null;
+			//timer.cancel();
+			//timer = null;
 		}
 
 	}
