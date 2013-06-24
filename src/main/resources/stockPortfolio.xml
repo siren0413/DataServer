@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list version="1.0">
+	<meta>
+		<type>resource-list</type>
+	</meta>
+	<resources>
+		<resource classname="Quote">
+			<field name="name">Apple Inc.</field>
+			<field name="price">450</field>
+			<field name="symbol">AAPL</field>
+			<field name="ts">1369425604</field>
+			<field name="type">equity</field>
+			<field name="volume">9872377</field>
+			<field name="tick">2000</field>
+			<field name="dividor">15000</field>
+			<field name="jump">1000</field>
+		</resource>
+		<resource classname="Quote">
+			<field name="name">Microsoft Corporation</field>
+			<field name="price">35</field>
+			<field name="symbol">MSFT</field>
+			<field name="ts">1369425601</field>
+			<field name="type">equity</field>
+			<field name="volume">33175804</field>
+			<field name="tick">5000</field>
+			<field name="dividor">30000</field>
+			<field name="jump">5000</field>
+		</resource>
+		<resource classname="Quote">
+			<field name="name">Google Inc.</field>
+			<field name="price">873</field>
+			<field name="symbol">GOOG</field>
+			<field name="ts">1369425604</field>
+			<field name="type">equity</field>
+			<field name="volume">2296760</field>
+			<field name="tick">2000</field>
+			<field name="dividor">10000</field>
+			<field name="jump">700</field>
+		</resource>
+		<resource classname="Quote">
+			<field name="name">Nokia Corporation</field>
+			<field name="price">3.65</field>
+			<field name="symbol">NOK</field>
+			<field name="ts">1369425635</field>
+			<field name="type">equity</field>
+			<field name="volume">25037513</field>
+			<field name="tick">8000</field>
+			<field name="dividor">50000</field>
+			<field name="jump">10000</field>
+		</resource>
+		<resource classname="Quote">
+			<field name="name">CME Group Inc.</field>
+			<field name="price">64.54</field>
+			<field name="symbol">CME</field>
+			<field name="ts">1369425600</field>
+			<field name="type">equity</field>
+			<field name="volume">1497347</field>
+			<field name="tick">5000</field>
+			<field name="dividor">250000</field>
+			<field name="jump">5000</field>
+		</resource>
+	</resources>
+</list>
