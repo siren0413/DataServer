@@ -1,12 +1,18 @@
 package com.trading.dataServer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 import com.trading.ServerSocketConnectionPool.ConnectionHandler;
 import com.trading.ServerSocketConnectionPool.ConnectionPool;
 import com.trading.dataGenerator.domain.StockProfile;
@@ -31,6 +37,7 @@ class StockConnectionHandler extends StockDataGenerator implements ConnectionHan
 	public void serverProcess(final Socket socket) {
 		Date lastDate = new Date();
 		PrintWriter writer = null;
+		ArrayList<String> symbols = new ArrayList<String>();
 
 		/**
 		 * Timer task to monitor is the client was already disconnect to this
@@ -61,18 +68,27 @@ class StockConnectionHandler extends StockDataGenerator implements ConnectionHan
 		 * this server, then the while loop breaks.
 		 */
 		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			String sym = br.readLine().trim();
+			String[] syms = sym.split("\\*");
+			for(String s: syms) {
+				symbols.add(s);
+			}
+			
 			writer = new PrintWriter(socket.getOutputStream());
 			while (!socket.isClosed()) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				if(!symbols.contains(profile.getSymbol()))
+					continue;
 				if (lastDate.compareTo(date) != 0) {
 					writer.write("SYMBOL=" + profile.getSymbol() + "*NAME=" + profile.getName() + "*PRICE=" + profile.getPrice()
 							+ "*TS=" + profile.getTs() + "*TYPE=" + profile.getType() + "*VOLUME=" + profile.getVolume() + "\n");
 					writer.flush();
 					lastDate.setTime(date.getTime());
+				}
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		} catch (Exception e) {
